@@ -27,9 +27,14 @@ export class CartService {
   async createCart(): Promise<Cart> {
     try {
       const cartId = randomUUID();
+
+      // Create context in Salesforce (they store SFInternalCartState in their backend)
       const sfContextId = this.sfClient.createContext();
 
       const now = new Date();
+
+      // Store OUR tracking/mapping layer (ContextStore)
+      // This maps our cartId -> Salesforce's contextId and tracks item ID translations
       const context: SalesforceContext = {
         sfContextId,
         cartId,
@@ -39,6 +44,7 @@ export class CartService {
         itemIdMapping: new Map(),
       };
 
+      // Store the cart in our cart store
       const cart: Cart = {
         cartId,
         items: [],
@@ -47,6 +53,10 @@ export class CartService {
         updatedAt: now,
       };
 
+      // Two stores are updated:
+      // 1. ContextStore - our tracking layer (cartId -> SalesforceContext)
+      // 2. CartStore - our cart state (cartId -> Cart)
+      // Note: Salesforce also stored SFInternalCartState in their backend (simulated)
       this.contextStore.set(cartId, context);
       this.cartStore.set(cartId, cart);
 

@@ -3,7 +3,12 @@ import { LineItem } from '../../domain/models/LineItem';
 
 const CONTEXT_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-interface SFCartContext {
+/**
+ * Internal state stored by Salesforce (simulated).
+ * This represents what Salesforce Commerce Cloud would store in their backend.
+ * Our application never directly accesses this - it's encapsulated within the client.
+ */
+interface SFInternalCartState {
   contextId: string;
   items: LineItem[];
   createdAt: Date;
@@ -24,7 +29,8 @@ export class SalesforceCartClientError extends Error {
 }
 
 export class SalesforceCartClient {
-  private contexts: Map<string, SFCartContext> = new Map();
+  // Simulates Salesforce's backend storage - this would be their database/cache
+  private contexts: Map<string, SFInternalCartState> = new Map();
 
   createContext(): string {
     const contextId = randomUUID();
@@ -108,7 +114,7 @@ export class SalesforceCartClient {
   }
 
   private validateContext(contextId: string): void {
-    const context = this.contexts.get(contextId);
+    const context: SFInternalCartState | undefined = this.contexts.get(contextId);
 
     if (!context) {
       throw new SalesforceCartClientError(

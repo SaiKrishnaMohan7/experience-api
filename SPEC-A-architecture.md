@@ -315,6 +315,11 @@ tests/
 5. **No Input Sanitization**: Beyond Zod validation
 6. **No Logging/Observability**: No structured logging or metrics
 7. **No Retry Logic**: Single attempt for SF operations (besides context refresh)
+8. **Memory Leak in Context Refresh**: When a context expires and is refreshed, the old `SFInternalCartState` remains in `SalesforceCartClient.contexts` Map. Production solutions:
+   - Auto-delete expired contexts when `SF_CONTEXT_EXPIRED` is thrown
+   - Implement lazy garbage collection (periodic sweep of expired entries)
+   - Use TTL-based cache like Redis with automatic eviction
+   - The cleanup should remain internal to SalesforceCartClient - CartService should never manage SF's internal storage
 
 ---
 

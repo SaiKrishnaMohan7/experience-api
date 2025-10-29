@@ -370,6 +370,7 @@ This is a take-home exercise implementation with intentional limitations:
 - Test double only (no real Salesforce integration)
 - No pre-commit hooks or linting configured
 - **Shallow copy only**: SalesforceCartClient returns shallow copies of cart items (`[...context.items]`). While this prevents array mutations, individual LineItem objects remain mutable. Full immutability would require deep freezing with `Object.freeze()` or using immutable data structures.
+- **Memory leak in context refresh**: When a Salesforce context expires and is refreshed, the old expired context remains in `SalesforceCartClient.contexts` Map indefinitely. In production, this should be addressed with auto-cleanup when contexts expire, lazy garbage collection, or TTL-based eviction.
 
 See `SPEC-A-architecture.md` for complete list of limitations and rationale.
 
