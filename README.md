@@ -259,6 +259,9 @@ npm run test:watch
 
 - **Stable Item IDs**: Item IDs remain stable across context refreshes, allowing clients to reliably reference items.
 
+- **Defensive Data Protection**: SalesforceCartClient returns copies of internal state (using spread operator `[...context.items]`) rather than references. This prevents external code from accidentally mutating the internal cart array.
+  - ⚠️ **Note**: Currently only the array is copied (shallow copy). LineItem objects themselves remain mutable. For stricter immutability, consider using `Object.freeze()` on each item or leveraging TypeScript's `readonly` modifier with runtime enforcement.
+
 - **Structured Logging**: Pino logger with pretty-printing in development, JSON in production.
 
 - **Type-Safe Errors**: Custom error classes for domain and infrastructure layers.
@@ -366,6 +369,7 @@ This is a take-home exercise implementation with intentional limitations:
 - No concurrency control
 - Test double only (no real Salesforce integration)
 - No pre-commit hooks or linting configured
+- **Shallow copy only**: SalesforceCartClient returns shallow copies of cart items (`[...context.items]`). While this prevents array mutations, individual LineItem objects remain mutable. Full immutability would require deep freezing with `Object.freeze()` or using immutable data structures.
 
 See `SPEC-A-architecture.md` for complete list of limitations and rationale.
 
