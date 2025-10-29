@@ -11,6 +11,11 @@ interface SFCartContext {
   checkedOut: boolean;
 }
 
+export interface SFCheckoutResult {
+  orderId: string;
+  items: LineItem[];
+}
+
 export class SalesforceCartClientError extends Error {
   constructor(public code: string, message: string) {
     super(message);
@@ -75,7 +80,7 @@ export class SalesforceCartClient {
     context.lastAccessedAt = new Date();
   }
 
-  checkout(contextId: string): { orderId: string; items: LineItem[] } {
+  checkout(contextId: string): SFCheckoutResult {
     this.validateContext(contextId);
     const context = this.contexts.get(contextId)!;
 

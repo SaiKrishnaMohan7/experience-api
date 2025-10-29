@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { Cart } from '../models/Cart';
 import { LineItem } from '../models/LineItem';
 import { Order } from '../models/Order';
-import { SalesforceCartClient, SalesforceCartClientError } from '../../infrastructure/salesforce/SalesforceCartClient';
+import { SalesforceCartClient, SalesforceCartClientError, SFCheckoutResult } from '../../infrastructure/salesforce/SalesforceCartClient';
 import { CartStore } from '../../infrastructure/stores/CartStore';
 import { ContextStore, SalesforceContext } from '../../infrastructure/stores/ContextStore';
 import { OrderStore } from '../../infrastructure/stores/OrderStore';
@@ -196,7 +196,7 @@ export class CartService {
       const sfContextId = await this.ensureValidContext(cartId);
 
       // Checkout in Salesforce
-      const sfResult = this.sfClient.checkout(sfContextId);
+      const sfResult: SFCheckoutResult = this.sfClient.checkout(sfContextId);
 
       // Create order
       const order: Order = {
