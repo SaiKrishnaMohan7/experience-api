@@ -49,7 +49,7 @@ describe('SalesforceCartClient', () => {
       expect(item.quantity).toBe(1);
     });
 
-    it('should throw SF_CONTEXT_NOT_FOUND for invalid contextId', () => {
+    it('should throw SF_INVALID_CONTEXT for invalid contextId', () => {
       expect(() => {
         client.addItem('invalid-context', {
           productType: ProductType.DEVICE,
@@ -68,7 +68,7 @@ describe('SalesforceCartClient', () => {
         });
       } catch (error) {
         expect(error).toBeInstanceOf(SalesforceCartClientError);
-        expect((error as SalesforceCartClientError).code).toBe('SF_CONTEXT_NOT_FOUND');
+        expect((error as SalesforceCartClientError).code).toBe('SF_INVALID_CONTEXT');
       }
     });
 

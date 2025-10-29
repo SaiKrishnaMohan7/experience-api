@@ -302,6 +302,59 @@ Built with ❤️ using [Claude Code](https://claude.com/claude-code)
 
 ---
 
+## 11. 🔒 Error Code Abstraction: Implementation Details vs API Contract
+
+### Sai's Insight
+> "When we validate context here: `if (!context)` do you think it is a good idea to throw INVALID_CONTEXT instead of not found? I feel like that leaks implementation details. What say you?"
+
+### The Issue
+Initial implementation used `SF_CONTEXT_NOT_FOUND`:
+```typescript
+if (!context) {
+  throw new SalesforceCartClientError(
+    'SF_CONTEXT_NOT_FOUND',  // ❌ Reveals internal storage
+    `Context '${contextId}' not found`
+  );
+}
+```
+
+**Problems**:
+- ❌ Leaks implementation - reveals we're storing contexts in a collection
+- ❌ Exposes storage mechanism - implies a lookup/search operation
+- ❌ Distinguishes "never existed" vs "was deleted" (implementation detail)
+- ❌ Not how real Salesforce API would behave
+
+### The Fix
+Refactored to `SF_INVALID_CONTEXT`:
+```typescript
+if (!context) {
+  throw new SalesforceCartClientError(
+    'SF_INVALID_CONTEXT',  // ✅ Properly opaque
+    `Invalid context '${contextId}'`
+  );
+}
+```
+
+**Benefits**:
+- ✅ **Better abstraction** - Doesn't reveal internal storage mechanism
+- ✅ **More semantic** - From caller's perspective, the contextId simply isn't valid/usable
+- ✅ **Simulates real APIs** - Real Salesforce would return "invalid session/context"
+- ✅ **Future-proof** - If we add tracing/logging, can include internal details there without exposing them in the API
+- ✅ **Separation of concerns** - Keeps context expiry handling separate with `SF_CONTEXT_EXPIRED`
+
+### Why This Was Excellent
+**Sai recognized that the SalesforceCartClient is simulating an external API** - and external APIs don't expose their internal implementation details. Real APIs don't say "not found in our database", they say "invalid/expired session".
+
+This demonstrates:
+- Deep understanding of API design principles
+- Thinking about abstraction layers properly
+- Recognition that error messages are part of the API contract
+- Awareness that internal details belong in logs/traces, not error codes
+
+The caller shouldn't care *why* the context is unusable (never existed, was deleted, expired) - just that it's not valid. This also aligns perfectly with the transparent refresh strategy where context expiry is already hidden from the client.
+
+---
+
 ## Summary: Before & After
 
 ### Before Interventions
@@ -325,6 +378,7 @@ Built with ❤️ using [Claude Code](https://claude.com/claude-code)
 - ✅ Comprehensive 350+ line README.md
 - ✅ Complete setup and troubleshooting guides
 - ✅ Honest attribution and acknowledgment
+- ✅ Properly abstracted error codes (SF_INVALID_CONTEXT vs SF_CONTEXT_NOT_FOUND)
 
 ---
 
@@ -353,6 +407,8 @@ Built with ❤️ using [Claude Code](https://claude.com/claude-code)
 - Error handling as first-class architectural concern
 - Complete end-to-end validation
 - Considers monitoring and operations
+- Recognizes API contracts shouldn't leak implementation details
+- Understands error codes are part of public API surface area
 
 ### Team Leadership
 - Chooses familiar technology over cutting-edge trends

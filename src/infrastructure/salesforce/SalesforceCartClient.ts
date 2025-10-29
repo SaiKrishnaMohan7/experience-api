@@ -112,8 +112,8 @@ export class SalesforceCartClient {
 
     if (!context) {
       throw new SalesforceCartClientError(
-        'SF_CONTEXT_NOT_FOUND',
-        `Context '${contextId}' not found`
+        'SF_INVALID_CONTEXT',
+        `Invalid context '${contextId}'`
       );
     }
 
