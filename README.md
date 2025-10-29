@@ -1,4 +1,4 @@
-# Bell Telecom Cart API
+# Experience API
 
 Experience API for Bell Telecom shopping cart that provides transparent abstraction over Salesforce cart context management.
 
